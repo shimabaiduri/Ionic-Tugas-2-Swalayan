@@ -20,24 +20,46 @@ import '@ionic/vue/css/text-transformation.css';
 import '@ionic/vue/css/flex-utils.css';
 import '@ionic/vue/css/display.css';
 
-/**
- * Ionic Dark Mode
- * -----------------------------------------------------
- * For more info, please see:
- * https://ionicframework.com/docs/theming/dark-mode
- */
-
-/* @import '@ionic/vue/css/palettes/dark.always.css'; */
-/* @import '@ionic/vue/css/palettes/dark.class.css'; */
-import '@ionic/vue/css/palettes/dark.system.css';
-
 /* Theme variables */
 import './theme/variables.css';
 
+/* import Global CSS */
+import './theme/global.css';
+
+import { axios } from './services/axios';
+import { token, user } from './services/user';
+
+import * as VueQrcodeReader from 'vue-qrcode-reader'
+
 const app = createApp(App)
   .use(IonicVue)
-  .use(router);
+  .use(router)
+  .use(VueQrcodeReader)
 
-router.isReady().then(() => {
-  app.mount('#app');
-});
+  axios.get('auth')
+    .then(result => {
+
+      const data = result.data?.value
+      const mess = result.data.mess
+      const isError = result.data.isError
+
+      if(isError) {
+        user.value = null
+        token.value = ''
+        return
+      }
+
+      user.value = data
+      // console.log(user.value)
+
+    }).catch(error => {
+
+    }).finally(() => {
+
+      router.isReady().then(() => {
+        app.mount('#app');
+      });
+      
+    })
+  
+
